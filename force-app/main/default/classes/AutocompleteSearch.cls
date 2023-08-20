@@ -5,6 +5,7 @@
  */
 public without sharing virtual class AutocompleteSearch {
     public static final Integer DEFAULT_SEARCH_RESULTS_LIMIT = 20;
+    public static final String DEFAULT_RETURN_FIELD = 'Name';
     public static final Set<String> WIERD_FIELDS = new Set<String> {'Tier'};
     public static final Map<String,String> SOSL_RETURN_TYPE_MAP = new Map<String,String>{
         'NAME' => 'String',
@@ -20,7 +21,7 @@ public without sharing virtual class AutocompleteSearch {
     }
     
     @AuraEnabled
-    public static List<AutoCompleteResult> getRecordsForAutocompleteSearch(String searchString, String searchField, String selectedSObject, Integer recordLimit, String fieldType, Map<String, Object> filterMap ) {
+    public static List<AutoCompleteResult> getRecordsForAutocompleteSearch(String searchString, String searchField, String fieldsToReturn, String selectedSObject, Integer recordLimit, String fieldType, Map<String, Object> filterMap ) {
         if(String.isEmpty(searchString)) return new List<AutoCompleteResult>();
         if(recordLimit == null) recordLimit = DEFAULT_SEARCH_RESULTS_LIMIT;
         if(String.isNotBlank(fieldType)) return searchSObjectWithSOSL(selectedSObject, searchString, fieldType, recordLimit, filterMap );
@@ -51,7 +52,8 @@ public without sharing virtual class AutocompleteSearch {
         System.debug('whereClause ' + whereClause);
         recordLimit = recordLimit == null ? DEFAULT_SEARCH_RESULTS_LIMIT : recordLimit;
         String rtClause = '';
-        String query = 'SELECT Id, Name FROM ' + selectedSObject + ' WHERE ' + whereClause + ' LIMIT ' + recordLimit;  
+        String returnFields = String.isBlank(fieldsToReturn) ? DEFAULT_RETURN_FIELD : string.escapeSingleQuotes(fieldsToReturn);
+        String query = 'SELECT Id, ' + returnFields + ' FROM ' + selectedSObject + ' WHERE ' + whereClause + ' LIMIT ' + recordLimit;  
         try{
             AutoCompleteResult acr;
             List<SObject> sobjectList = Database.query(query);
@@ -59,14 +61,21 @@ public without sharing virtual class AutocompleteSearch {
             for(SObject sobj :sobjectList){
                 acr = new AutoCompleteResult();
                 acr.Id = String.valueOf(sobj.get('Id'));
-                acr.value = String.valueOf(sobj.get('Name'));
+                acr.value = getReturnValue(sobj, returnFields); 
                 output.add(acr);
                 }
             return output;
         } catch(Exception e){
-            System.debug('Exception in getRecordsForAutocompleSearch. Query: ' + query + ' and the error: ' + e.getMessage());
+            System.debug('Exception in getRecordsForAutocompleSearch. Query: ' + query + ' and the error: ' + e.getMessage() + ' ' + e.getStackTraceString());
             return new List<AutoCompleteResult>();
         }
+    }
+
+    public static String getReturnValue(SObject sobj, String returnFields) {
+        if(String.isBlank(returnFields)) return String.valueOf(sobj.get(DEFAULT_RETURN_FIELD));
+        String value = '';
+        for(String field : returnFields.split(',')) value += String.valueOf(sobj.get(field.deleteWhitespace())) + ' ';
+        return value.removeEnd(' ');
     }
 
     /*

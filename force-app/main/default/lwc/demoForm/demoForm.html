@@ -15,10 +15,11 @@
                 </c-autocomplete-search-server>
             </lightning-layout-item>
 
-            <lightning-layout-item class="slds-p-left_small" size="3">
+            <lightning-layout-item class="slds-p-left_small" size="4">
                 <c-autocomplete-search-server 
                     search-label="Contact Phone"
                     search-field="Phone"
+                    fields-to-return="Name, Phone"
                     value={phoneVal}
                     selectedsobject="Contact"
                     is-required="true"

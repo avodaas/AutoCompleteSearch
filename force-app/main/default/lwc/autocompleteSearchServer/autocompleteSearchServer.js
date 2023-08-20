@@ -9,6 +9,7 @@ export default class AutocompleteSearchServer extends LightningElement {
 	@api recordLimit = 20;  
 	@api searchLabel;  
 	@api searchField;
+	@api fieldsToReturn;
 	@api searchDisabled = false;
 	@api fieldType;
 	@api isRequired;
@@ -28,7 +29,7 @@ export default class AutocompleteSearchServer extends LightningElement {
 		}
 		// Wire method to function, which accepts the Search String, Dynamic SObject, Record Limit, Search Field  
 		getRecordsForAutocompleteSearch({searchString: this.searchString , selectedSObject : this.selectedsobject, recordLimit : this.recordLimit, 
-			searchField : this.searchField, fieldType :this.fieldType, filterMap: this.objectjson})
+			searchField : this.searchField, fieldsToReturn: this.fieldsToReturn, fieldType :this.fieldType, filterMap: this.objectjson})
 		.then(result => {
 			this.populateRecords(result);
 		})
