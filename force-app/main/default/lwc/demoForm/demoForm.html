@@ -1,0 +1,48 @@
+<template>
+    <lightning-card title="Demo Form" class="slds-p-around_large">
+        <lightning-layout class="slds-p-around_medium">
+            <lightning-layout-item size="3">
+                <c-autocomplete-search-server 
+                    search-label="Resident"
+                    selected-name={selectedConName}
+                    value={residentId}
+                    search-field="Name"
+                    selectedsobject="Contact"
+                    record-limit="10"
+                    objectjson={residentFilter}
+                    onlookupselect={handleConChange}
+                    onunlookupselect={clearExistingCon}>
+                </c-autocomplete-search-server>
+            </lightning-layout-item>
+
+            <lightning-layout-item class="slds-p-left_small" size="4">
+                <c-autocomplete-search-server 
+                    search-label="Contact Phone"
+                    search-field="Phone"
+                    fields-to-return="Name, Phone"
+                    value={phoneVal}
+                    selectedsobject="Contact"
+                    is-required="true"
+                    record-limit="5"
+                    onlookupselect={handlePhoneChange}
+                    onunlookupselect={clearExistingPhone}>
+                </c-autocomplete-search-server>
+            </lightning-layout-item>
+    
+            <lightning-layout-item class="slds-p-left_small" size="3">
+                <c-autocomplete-search-server 
+                    search-disabled="true"
+                    search-label="Account"
+                    selected-name={selectedAcctName}
+                    value={acctId}
+                    search-field="Name"
+                    selectedsobject="Account"
+                    is-required="true"
+                    record-limit="10"
+                    onlookupselect={handleAcctChange}
+                    onunlookupselect={clearExistingAcct}>
+                </c-autocomplete-search-server>
+            </lightning-layout-item>
+        </lightning-layout>
+    </lightning-card>
+</template>
