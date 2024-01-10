@@ -1,4 +1,9 @@
 import { LightningElement, api} from 'lwc';  
+
+import {loadStyle} from 'lightning/platformResourceLoader';
+
+import autocompleteStyle from '@salesforce/resourceUrl/autocompleteStyle';
+
 import getRecordsForAutocompleteSearch from '@salesforce/apex/AutocompleteSearch.getRecordsForAutocompleteSearch';
 
 export default class AutocompleteSearchServer extends LightningElement {
@@ -19,6 +24,19 @@ export default class AutocompleteSearchServer extends LightningElement {
 	noRecordsFlag = false;
 	showoptions = false;
 
+	renderedCallback(){
+        try{
+            Promise.all([loadStyle(this, autocompleteStyle)]).then(()=>{
+                console.log('Styles loaded');
+            })
+            .catch(error =>{
+                console.log('Error loading styles: ', error.body.message);
+            });
+        } catch(error){
+            console.log('Error rendering callback: ', error);
+        }
+    }
+	
 	@api
 	loadRecords(){
 		if(!this.searchString) return;
